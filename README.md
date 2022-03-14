@@ -1,8 +1,10 @@
 # wg-auto
 
-Automatically generate new TCP/UDP ports for Wireguard if forbidden.
+Automatically set up a wireguard server and capable of generating new TCP/UDP ports if forbidden.
 
 ![](demo.png)
+
+![](https://raw.githubusercontent.com/WeeJeWel/wg-easy/master/assets/screenshot.png)
 
 ## Docker
 
