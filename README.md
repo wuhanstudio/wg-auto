@@ -7,7 +7,11 @@ Automatically generate new TCP/UDP ports for Wireguard if forbidden.
 ## Docker
 
 ```
-$ docker run -d -e WG_PASSWORD=🚨YOUR_ADMIN_PASSWORD --network host -v /var/run/docker.sock:/var/run/docker.sock wuhanstudio/wg-auto
+$ docker run -d \
+  --network host \
+  -e WG_PASSWORD=🚨YOUR_ADMIN_PASSWORD \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  wuhanstudio/wg-auto
 ```
 
 ## Quick Start
