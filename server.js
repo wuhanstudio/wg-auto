@@ -41,15 +41,14 @@ io.on('connection', async (socket) => {
             console.error(error)
         })
 
-    console.log(ip, ui_port, 'UDP:', udp_port)
-
-    io.emit('ip', ip, ui_port, udp_port)
-
+        io.emit('ip', ip, ui_port, udp_port)
     // User requests new port
-    socket.on('refresh', () => {
-        console.log('udp port requested', udp_port)
-        portfinder.basePort = udp_port+1;    // default: 8000
-        new_ip()
+    socket.on('refresh', async () => {
+	console.log('User requested NEW PORT')
+        portfinder.basePort = udp_port+1    // default: 8000
+	console.log('Baseport:', portfinder.basePort)
+        await new_ip()
+        io.emit('ip', ip, ui_port, udp_port)
     })
 
     // Client disconnected
@@ -59,7 +58,7 @@ io.on('connection', async (socket) => {
 })
 
 // Create a Server
-var server = http.listen(8080, () => {
+var server = http.listen(8181, () => {
 
     var host = server.address().address
     var port = server.address().port
@@ -69,16 +68,18 @@ var server = http.listen(8080, () => {
 
 async function new_ip() {
     portfinder.getPortPromise()
-    .then((p) => {
-        ui_port = p
+    .then((tcp) => {
+	console.log("New TCP:", tcp)
+        ui_port = tcp
     })
     .catch((err) => {
         console.log(err)
     });
 
     portfinder.getPortPromise()
-        .then((p) => {
-            udp_port = p
+        .then((udp) => {
+	console.log("New UDP:", udp)
+            udp_port = udp
         })
         .catch((err) => {
             console.log(err)
@@ -88,32 +89,55 @@ async function new_ip() {
         .get('https://ifconfig.co/ip')
         .then(res => {
             ip = res.data.replace(/(\r\n|\n|\r)/gm, "");//remove those line breaks
+	    console.log('Server IP', ip)
         })
         .catch(error => {
             console.error(error)
         })
 
-    console.log('Initialized with:', ip, ui_port, 'UDP:', udp_port)
+
+    if(container_id !== "")
+	{
+docker.container.list({all:true})
+            .then((containers) => {
+                containers.forEach(container => {
+                    if(container.data.Id == container_id) {
+                            // Delete container
+			    console.log("Removing previous container", container_id)
+                            container.delete({ force: true })
+                    }
+                })
+            })
+            .catch(error => console.log(error))
+
+	}
 
     // Start Docker container
     docker.container.create({
         Image: 'weejewel/wg-easy',
         "Env": [
             "WG_HOST=" + ip,
+	    "WG_PORT=" + udp_port.toString(),
             "PASSWORD=wireguard"
         ],
+        HostConfig: {
         "Sysctls": {
             "net.ipv4.ip_forward": "1",
             "net.ipv4.conf.all.src_valid_mark": "1"
         },
         "CapAdd": ["NET_ADMIN", "SYS_MODULE"],
-        HostConfig: {
-            "PortBindings": {
+        "PortBindings": {
                 "51820/udp": [ // port inside of docker container 
-                    {"HostPort": "8000"} // port on host machine
+		    {
+			"HostIp": "0.0.0.0",
+                    	"HostPort": udp_port.toString()
+		    } // port on host machine
                 ],
-                "51821/udp": [ // port inside of docker container 
-                    {"HostPort": "8001"} // port on host machine
+                "51821/tcp": [ // port inside of docker container 
+                    {
+			    "HostIp": "0.0.0.0",
+			    "HostPort": ui_port.toString()
+		    } // port on host machine
                 ]
             }
         },
@@ -125,12 +149,30 @@ async function new_ip() {
     .then( (container) => {
         // Start container
         container_id = container.data.Id 
-        socket.emit('info','Container Id: ' + container_id)
+	console.log('Container Started:', container_id)
+        console.log('Initialized with:', ip, ui_port, 'UDP:', udp_port)
         return container.start()
     })
-
-
-    io.emit('ip', ip, ui_port, udp_port)
 }
+
+const cleanUpServer = async () => {
+await docker.container.list({all:true})
+            .then((containers) => {
+                containers.forEach(container => {
+                    if(container.data.Id == container_id) {
+                            // Delete container
+                            container.delete({ force: true })
+                    }
+                })
+            })
+            .catch(error => console.log(error))
+console.log('Goodbye!');
+	process.exit(0);
+}
+
+process.on('exit', function () {
+    // Do some cleanup such as close db
+    console.log('\nGoogbye!\n')
+});
 
 new_ip()
