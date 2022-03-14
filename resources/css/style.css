@@ -1,0 +1,10 @@
+.vertical-center {
+    width: 80%;
+    margin-left: 10%;
+    margin-top: 10%;
+}
+
+a, a:hover {
+    color: inherit; /* blue colors for links too */
+    text-decoration: inherit; /* no underline */
+}
