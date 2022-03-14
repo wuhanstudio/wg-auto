@@ -22,5 +22,6 @@ $ export WG_PASSWORD=YOUR_PASSWORD
 $ npm install
 $ node server.js
 
-The website is available now at http://localhost:3000
 ```
+
+The website is available now at **http://localhost:3000**
