@@ -3,12 +3,16 @@
 // Web Server
 var express = require('express')
 var app = express()
+var port = process.env.PORT || 3000;
 
 const axios = require('axios')
 
 let ip = "127.0.0.1"
 let ui_port = 51822
 let udp_port = 51821
+
+// Set password from environment variable WG_PASSWORD
+var password = process.env.WG_PASSWORD || "password"
 
 let container_id = ""
 
@@ -65,7 +69,7 @@ io.on('connection', async (socket) => {
 })
 
 // Create a Server
-var server = http.listen(8181, () => {
+var server = http.listen(port, () => {
 
     var host = server.address().address
     var port = server.address().port
@@ -127,7 +131,7 @@ async function new_udp() {
         "Env": [
             "WG_HOST=" + ip,
             "WG_PORT=" + udp_port.toString(),
-            "PASSWORD=wireguard"
+            "PASSWORD=" + password
         ],
         HostConfig: {
             "Sysctls": {
