@@ -1,6 +1,6 @@
 # wg-auto
 
-Automatically set up a wireguard server and capable of generating new TCP/UDP ports if forbidden.
+Automatically set up a wireguard server that is capable of generating new TCP/UDP ports if forbidden.
 
 ![](demo.png)
 
