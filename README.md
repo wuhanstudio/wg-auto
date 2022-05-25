@@ -6,7 +6,7 @@ Automatically set up a wireguard server that is capable of generating new TCP/UD
 
 ![](https://raw.githubusercontent.com/WeeJeWel/wg-easy/master/assets/screenshot.png)
 
-## Docker
+## Quick Start
 
 ```
 $ docker run -d \
@@ -16,7 +16,9 @@ $ docker run -d \
   wuhanstudio/wg-auto
 ```
 
-## Quick Start
+The website is available now at **http://YOUR_HOST_IP:3000**
+
+## For Development
 
 ```
 $ docker pull weejewel/wg-easy
