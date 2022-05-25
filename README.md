@@ -9,6 +9,7 @@ Automatically set up a wireguard server that is capable of generating new TCP/UD
 ## Quick Start
 
 ```
+$ docker pull weejewel/wg-easy
 $ docker run -d \
   --network host \
   -e WG_PASSWORD=🚨YOUR_ADMIN_PASSWORD \
